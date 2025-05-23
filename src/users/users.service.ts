@@ -2,15 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
-// import * as bcrypt from 'bcrypt'; // KHÔNG CẦN DÙNG bcrypt nữa
+import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private jwtService: JwtService, // Inject JWT service
+  ) {}
 
   async create(name: string, email: string, password: string): Promise<User> {
-    // Không băm mật khẩu nữa, lưu trực tiếp
-    const createdUser = new this.userModel({ name, email, password });
+    const hashedPassword = await bcrypt.hash(password, 10); // Băm mật khẩu
+    const createdUser = new this.userModel({ name, email, password: hashedPassword });
     return createdUser.save();
   }
 
@@ -18,17 +22,18 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  async login(email: string, password: string): Promise<User | null> {
+  async login(email: string, password: string): Promise<{ access_token: string } | null> {
     const user = await this.userModel.findOne({ email });
 
-    if (!user) return null; // Không tìm thấy người dùng với email này
+    if (!user) return null;
 
-    // So sánh mật khẩu dạng văn bản thuần
-    // (LƯU Ý: RẤT KHÔNG AN TOÀN)
-    if (user.password !== password) {
-      return null; // Mật khẩu không khớp
-    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return null;
 
-    return user; // Đăng nhập thành công
+    // Tạo JWT token
+    const payload = { email: user.email, sub: user._id };
+    const access_token = await this.jwtService.signAsync(payload);
+
+    return { access_token };
   }
 }

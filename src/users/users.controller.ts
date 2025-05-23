@@ -17,13 +17,15 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    const user = await this.usersService.login(body.email, body.password);
-    if (!user) {
+    const result = await this.usersService.login(body.email, body.password);
+    
+    if (!result) {
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
+
     return {
       message: 'Đăng nhập thành công',
-      user,
+      access_token: result.access_token,
     };
   }
 }
