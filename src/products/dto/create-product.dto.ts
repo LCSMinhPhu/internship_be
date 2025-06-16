@@ -5,5 +5,5 @@ export class CreateProductDto {
   price: number;
   category: string;
   status: 'active' | 'disable';
-  image?: string; // thêm
+  image?: string; 
 }

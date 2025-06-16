@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { join } from 'path';
 import * as express from 'express';
-
+import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.useGlobalPipes(new ValidationPipe());
   // Di chuyển đoạn code enableCors vào đây, sau khi 'app' đã được tạo
   app.enableCors({
     origin: 'http://localhost:3000', // FE port

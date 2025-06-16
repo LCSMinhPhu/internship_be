@@ -21,6 +21,8 @@ export class Product {
   status: string;
   @Prop({ required: false }) // không bắt buộc, tránh lỗi nếu thiếu
 image: string;
+  @Prop({ default: ['user'], type: [String] }) // Một người dùng có thể có nhiều role
+roles: string[];
 
 }
 

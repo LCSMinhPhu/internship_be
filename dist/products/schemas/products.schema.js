@@ -18,6 +18,7 @@ let Product = class Product {
     category;
     status;
     image;
+    roles;
 };
 exports.Product = Product;
 __decorate([
@@ -44,6 +45,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], Product.prototype, "image", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: ['user'], type: [String] }),
+    __metadata("design:type", Array)
+], Product.prototype, "roles", void 0);
 exports.Product = Product = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Product);
